@@ -1,8 +1,8 @@
 import numpy as np
 import splipy
-from splipy import Curve
 from sklearn.linear_model import LinearRegression
-import matplotlib.pyplot as plt
+from scipy.optimize import lsq_linear
+
 
 def f(x):
     return -0.5 * np.log(2 * np.pi) - 0.5 * x**2
@@ -30,12 +30,16 @@ def get_BSpline_decomposition(f, X, order=4, Constraint=None):
     X_Tilde = np.array([BSpline_Basis_M.evaluate(x)[0] for x in sorted_X])
 
     if Constraint == "Concavity":
-        Sigma = np.array([[aux_concavity_matrix(i+1,j+1) for j in range(N+M)] for i in range(N+M)])
+        Sigma = np.array([[aux_concavity_matrix(i+1, j+1)
+                           for j in range(N+M)] for i in range(N+M)])
         X_Tilde = np.matmul(X_Tilde, Sigma)
-        model = LinearRegression(fit_intercept=False)
-        model.fit(X_Tilde, f_X)
-        Beta = np.matmul(Sigma, model.coef_)
-        
+
+        lower_bounds = np.concatenate(([-np.inf], np.zeros(X_Tilde.shape[1] - 1)))
+        upper_bounds = np.full(X_Tilde.shape[1], np.inf)
+
+        res = lsq_linear(X_Tilde, f_X, bounds=(lower_bounds, upper_bounds))
+        Beta = np.matmul(Sigma, res.x)
+
     else:
         model = LinearRegression(fit_intercept=False)
         model.fit(X_Tilde, f_X)

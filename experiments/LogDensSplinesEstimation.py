@@ -4,20 +4,41 @@ from splipy import Curve
 from variational.spline_estimation import get_BSpline_decomposition
 
 def f(x):
-    return -0.5 * np.log(2 * np.pi) - 0.5 * x**2
+    p1, mu1, sigma1 = 0.5, -3, 1
+    p2, mu2, sigma2 = 0.5, 3, 1
+    dens = (
+        p1 / (np.sqrt(2 * np.pi) * sigma1) * np.exp(-0.5 * ((x - mu1) / sigma1) ** 2)
+        + p2 / (np.sqrt(2 * np.pi) * sigma2) * np.exp(-0.5 * ((x - mu2) / sigma2) ** 2)
+    )
+    return np.log(dens)
+
+def f2(x):
+    mu, sigma = 0, 2
+    return -0.5 * np.log(2 * np.pi * sigma**2) - 0.5 * ((x - mu) / sigma) ** 2
 
 N = 10
 order = 4
-X = np.random.normal(loc=0, scale=10, size=N)
+X = np.linspace(-10, 10, N)
 
-Beta, BSpline_Basis, _, knots = get_BSpline_decomposition(f, X, order=order, Constraint="Concavity")
-approx_curve = Curve(BSpline_Basis, Beta.reshape(-1, 1))
+Beta1, BSpline_Basis1, _, knots1 = get_BSpline_decomposition(f, X, order=order, Constraint="Concavity")
+approx_curve1 = Curve(BSpline_Basis1, Beta1.reshape(-1, 1))
 
-x_axis = np.linspace(knots[0], knots[-1], 1000)
-y_axis = np.array([approx_curve.evaluate(x) for x in x_axis])
-y_axis2 = f(x_axis)
+x_axis = np.linspace(knots1[0], knots1[-1], 1000)
+y_axis1 = np.array([approx_curve1.evaluate(x) for x in x_axis])
+y_true1 = f(x_axis)
 
-plt.plot(x_axis, y_axis, label='Spline curve')
-plt.plot(x_axis, y_axis2, label='True log-density', linestyle='dashed')
+Beta2, BSpline_Basis2, _, knots2 = get_BSpline_decomposition(f2, X, order=order, Constraint="Concavity")
+approx_curve2 = Curve(BSpline_Basis2, Beta2.reshape(-1, 1))
+
+x_axis2 = np.linspace(knots2[0], knots2[-1], 1000)
+y_axis2 = np.array([approx_curve2.evaluate(x) for x in x_axis2])
+y_true2 = f2(x_axis2)
+
+plt.figure(figsize=(8, 5))
+plt.plot(x_axis, y_axis1, label="Spline (bimodal concave)")
+plt.plot(x_axis, y_true1, "--", label="True bimodal log-density")
+plt.plot(x_axis2, y_axis2, label="Spline (Gaussian concave)")
+plt.plot(x_axis2, y_true2, "--", label="True Gaussian log-density")
 plt.legend()
+plt.title("Spline approximations of log-densities")
 plt.show()
