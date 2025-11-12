@@ -16,7 +16,7 @@ def f2(x):
     mu, sigma = 0, 2
     return -0.5 * np.log(2 * np.pi * sigma**2) - 0.5 * ((x - mu) / sigma) ** 2
 
-N = 10
+N = 100
 order = 4
 X = np.linspace(-10, 10, N)
 
@@ -35,10 +35,10 @@ y_axis2 = np.array([approx_curve2.evaluate(x) for x in x_axis2])
 y_true2 = f2(x_axis2)
 
 plt.figure(figsize=(8, 5))
-plt.plot(x_axis, y_axis1, label="Spline (bimodal concave)")
-plt.plot(x_axis, y_true1, "--", label="True bimodal log-density")
-plt.plot(x_axis2, y_axis2, label="Spline (Gaussian concave)")
-plt.plot(x_axis2, y_true2, "--", label="True Gaussian log-density")
+plt.plot(x_axis, y_axis1)
+plt.plot(x_axis, y_true1, "--")
+plt.plot(x_axis2, y_axis2)
+plt.plot(x_axis2, y_true2, "--")
 plt.legend()
-plt.title("Spline approximations of log-densities")
-plt.show()
+
+plt.savefig("graphs/density_spline_approximations_" + str(N) + "points_" + str(order) + "order.png")
