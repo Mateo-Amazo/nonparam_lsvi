@@ -20,14 +20,16 @@ N = 100
 order = 4
 X = np.linspace(-10, 10, N)
 
-Beta1, BSpline_Basis1, _, knots1 = get_BSpline_decomposition(f, X, order=order, Constraint="Concavity")
+Beta1, BSpline_Basis1, _ = get_BSpline_decomposition(f, X, order=order, Constraint="Concavity")
+knots1 = BSpline_Basis1.knots
 approx_curve1 = Curve(BSpline_Basis1, Beta1.reshape(-1, 1))
 
 x_axis = np.linspace(knots1[0], knots1[-1], 1000)
 y_axis1 = np.array([approx_curve1.evaluate(x) for x in x_axis])
 y_true1 = f(x_axis)
 
-Beta2, BSpline_Basis2, _, knots2 = get_BSpline_decomposition(f2, X, order=order, Constraint="Concavity")
+Beta2, BSpline_Basis2, _ = get_BSpline_decomposition(f2, X, order=order, Constraint="Concavity")
+knots2 = BSpline_Basis2.knots
 approx_curve2 = Curve(BSpline_Basis2, Beta2.reshape(-1, 1))
 
 x_axis2 = np.linspace(knots2[0], knots2[-1], 1000)

@@ -48,4 +48,14 @@ def get_BSpline_decomposition(f, X, order=4, Constraint=None, At=None, Bt=None):
 
     else:
         beta = lsq_linear(X_Tilde, f_X)
-    return beta, BSpline_Basis_M, BSpline_Basis_M1, knots
+
+    
+    return beta, BSpline_Basis_M, BSpline_Basis_M1
+
+def get_beta_derivative(beta, knots, N, order):
+    beta_deriv = [0 for k in range(N+order+1)]
+    beta_deriv[0] = beta[0]/(knots[order-1]-knots[0])
+    beta_deriv[-1] = -beta[N+order-1]/(knots[N+2*order-1]-knots[N+order])
+    for i in range(1, N+order-1):
+        beta_deriv[i] = (beta[i]-beta[i-1])/(knots[i+order-1]-knots[i])
+    return beta_deriv
