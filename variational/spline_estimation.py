@@ -16,17 +16,17 @@ def aux_concavity_matrix(i,j):
     if j>=3 and i>=j:
         return j-i-1
 
-def get_BSpline_decomposition(f, X, order=4, Constraint=None, At=None, Bt=None):
+def get_BSpline_decomposition(f, X, order=4, Constraint=None, a=None, b=None):
 
     N = len(X)
     M = order
     sorted_X = np.sort(X)
 
-    if At is None or Bt is None:
-        At = sorted_X[0]
-        Bt = sorted_X[-1]
+    if a is None or b is None:
+        a = sorted_X[0]
+        b = sorted_X[-1]
 
-    knots = np.concatenate([[At for i in range(order)], sorted_X, [Bt for i in range(order)]])
+    knots = np.concatenate([[a for i in range(order)], sorted_X, [b for i in range(order)]])
 
 
     f_X = f(sorted_X)
@@ -53,9 +53,12 @@ def get_BSpline_decomposition(f, X, order=4, Constraint=None, At=None, Bt=None):
     return beta, BSpline_Basis, BSpline_Basis_lower
 
 def get_beta_derivative(beta, knots, N, order):
+
     beta_deriv = [0 for k in range(N+order+1)]
-    beta_deriv[0] = beta[0]/(knots[order-1]-knots[0])
-    beta_deriv[-1] = -beta[N+order-1]/(knots[N+2*order-1]-knots[N+order])
+    beta_deriv[0] = beta[0]/(knots[order-1]-knots[0]) if knots[order-1]!=knots[0] else 0
+    beta_deriv[-1] = -beta[N+order-1]/(knots[N+2*order-1]-knots[N+order]) if knots[N+2*order-1]!=knots[N+order] else 0
+
     for i in range(1, N+order-1):
-        beta_deriv[i] = (beta[i]-beta[i-1])/(knots[i+order-1]-knots[i])
-    return order*beta_deriv
+        beta_deriv[i] = (beta[i]-beta[i-1])/(knots[i+order-1]-knots[i]) if knots[i+order-1]!=knots[i] else 0
+
+    return order*np.array(beta_deriv)
