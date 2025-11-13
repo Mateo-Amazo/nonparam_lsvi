@@ -1,4 +1,3 @@
-import numpy as np
 from scipy.optimize import minimize, fsolve
 
 def find_mode(B):

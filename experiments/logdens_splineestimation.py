@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 from splipy import Curve
 from variational.spline_estimation import get_BSpline_decomposition
 
+N = 100
+order = 4
+
 def f(x):
     p1, mu1, sigma1 = 0.5, -3, 1
     p2, mu2, sigma2 = 0.5, 3, 1
@@ -16,8 +19,6 @@ def f2(x):
     mu, sigma = 0, 2
     return -0.5 * np.log(2 * np.pi * sigma**2) - 0.5 * ((x - mu) / sigma) ** 2
 
-N = 100
-order = 4
 X = np.linspace(-10, 10, N)
 
 Beta1, BSpline_Basis1, _ = get_BSpline_decomposition(f, X, order=order, Constraint="Concavity")

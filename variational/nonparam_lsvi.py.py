@@ -21,11 +21,11 @@ def non_param_lsvi(f, order=4, N=20, Constraint=None):
 
     while boolean:
         
-        beta, BSpline_Basis_M, BSpline_Basis_M1 = get_BSpline_decomposition(f, X=X, order=order, Constraint=Constraint, At=At, Bt=Bt)[1]
-        beta_deriv = get_beta_derivative(beta, BSpline_Basis_M.knots, N=len(X), order=order)
+        beta, BSpline_Basis, BSpline_Basis_lower = get_BSpline_decomposition(f, X=X, order=order, Constraint=Constraint, At=At, Bt=Bt)[1]
+        beta_deriv = get_beta_derivative(beta, BSpline_Basis.knots, N=len(X), order=order)
 
-        B = Curve(BSpline_Basis_M, beta.reshape(-1, 1)).evaluate
-        B_Prime = Curve(BSpline_Basis_M1, beta_deriv.reshape(-1, 1)).evaluate
+        B = Curve(BSpline_Basis, beta.reshape(-1, 1)).evaluate
+        B_Prime = Curve(BSpline_Basis_lower, beta_deriv.reshape(-1, 1)).evaluate
 
         X = generate_data(B= B, B_Prime=B_Prime, N=N, eps=eps)
 
@@ -33,4 +33,4 @@ def non_param_lsvi(f, order=4, N=20, Constraint=None):
             boolean = False
 
 
-    return Curve(BSpline_Basis_M, beta.reshape(-1, 1)).evaluate
+    return Curve(BSpline_Basis, beta.reshape(-1, 1)).evaluate

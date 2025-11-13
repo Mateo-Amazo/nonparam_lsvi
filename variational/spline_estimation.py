@@ -30,10 +30,10 @@ def get_BSpline_decomposition(f, X, order=4, Constraint=None, At=None, Bt=None):
 
 
     f_X = f(sorted_X)
-    BSpline_Basis_M = splipy.BSplineBasis(order=order, knots=knots)
-    BSpline_Basis_M1 = splipy.BSplineBasis(order=order-1, knots=knots)
+    BSpline_Basis = splipy.BSplineBasis(order=order, knots=knots)
+    BSpline_Basis_lower = splipy.BSplineBasis(order=order-1, knots=knots)
 
-    X_Tilde = np.array([BSpline_Basis_M.evaluate(x)[0] for x in sorted_X])
+    X_Tilde = np.array([BSpline_Basis.evaluate(x)[0] for x in sorted_X])
 
     if Constraint == "Concavity":
         Sigma = np.array([[aux_concavity_matrix(i+1, j+1)
@@ -50,7 +50,7 @@ def get_BSpline_decomposition(f, X, order=4, Constraint=None, At=None, Bt=None):
         beta = lsq_linear(X_Tilde, f_X)
 
     
-    return beta, BSpline_Basis_M, BSpline_Basis_M1
+    return beta, BSpline_Basis, BSpline_Basis_lower
 
 def get_beta_derivative(beta, knots, N, order):
     beta_deriv = [0 for k in range(N+order+1)]
@@ -58,4 +58,4 @@ def get_beta_derivative(beta, knots, N, order):
     beta_deriv[-1] = -beta[N+order-1]/(knots[N+2*order-1]-knots[N+order])
     for i in range(1, N+order-1):
         beta_deriv[i] = (beta[i]-beta[i-1])/(knots[i+order-1]-knots[i])
-    return beta_deriv
+    return order*beta_deriv
