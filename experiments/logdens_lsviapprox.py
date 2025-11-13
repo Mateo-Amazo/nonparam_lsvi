@@ -6,7 +6,8 @@ from variational.nonparam_lsvi import nonparam_lsvi
 
 N = 10
 order = 4
-rho = 0
+rho = 1
+eps = 1
 
 def f(x):
     p1, mu1, sigma1 = 0.5, -3, 1
@@ -17,5 +18,5 @@ def f(x):
     )
     return np.log(dens)
 
-approxList = nonparam_lsvi(f, order=order, N=N, rho=rho, Constraint="Concavity")
+approxList = nonparam_lsvi(f, order=order, eps=eps, N=N, rho=rho, Constraint="Concavity")
 print(len(approxList))

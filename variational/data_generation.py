@@ -35,10 +35,10 @@ def generate_data(B, B_Prime, N, rho):
             W = np.random.uniform(0,1)
 
 
-            if U <= q/(q + p + r):
+            if U*(q + p + r) <= q:
                 x = -s_tilde + q*V
 
-            elif U <= (q + p)/(q + p + r):
+            elif U*(q + p + r) <= (q + p):
                 x = z_tilde - r*np.log(V)
 
             else:
