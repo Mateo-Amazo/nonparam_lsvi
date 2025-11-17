@@ -22,7 +22,7 @@ def generate_data(B, B_Prime, N, rho):
     q = z_tilde + s_tilde
 
     print("Generating data with parameters:")
-    print(f"mode: {mode}, s: {s}, z: {z}, ksi: {ksi}, dzeta: {dzeta}")
+    print(f"mode: {mode}, s: {s}, s_tilde: {s_tilde}, z: {z}, z_tilde: {z_tilde}, ksi: {ksi}, dzeta: {dzeta}")
 
     samples = []
 

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from variational.nonparam_lsvi import nonparam_lsvi
 
 
-N = 30
+N = 10
 order = 4
 rho = 0
 eps = 1
@@ -16,7 +16,7 @@ def f(x):
         p1 / (np.sqrt(2 * np.pi) * sigma1) * np.exp(-0.5 * ((x - mu1) / sigma1) ** 2)
         + p2 / (np.sqrt(2 * np.pi) * sigma2) * np.exp(-0.5 * ((x - mu2) / sigma2) ** 2)
     )
-    return np.log(dens)
+    return np.log(dens)+10
 
 approxList = nonparam_lsvi(f, order=order, eps=eps, N=N, rho=rho)
 print(len(approxList))

@@ -6,7 +6,7 @@ from variational.data_generation import generate_data
 from variational.spline_estimation import get_BSpline_decomposition, get_beta_derivative
 from variational.optimization import find_mode
 
-epsilon = 1e-8
+epsilon = 1e-10
 
 def nonparam_lsvi(f, order=4, N=20, rho=0.5, eps=1e-1, Constraint="Concavity"):
     
@@ -33,27 +33,30 @@ def nonparam_lsvi(f, order=4, N=20, rho=0.5, eps=1e-1, Constraint="Concavity"):
 
         def B(x):
             if x>knots[-1]:
-                return B_aux(knots[-1])[0] + B_Prime_aux(knots[-1])[0]*(x - knots[-1])
+                return B_aux(knots[-1]-epsilon)[0] + B_Prime_aux(knots[-1]-epsilon)[0]*(x - knots[-1])
             elif x<knots[0]:
-                return B_aux(knots[0])[0] + B_Prime_aux(knots[0])[0]*(x - knots[0])
+                return B_aux(knots[0]+epsilon)[0] + B_Prime_aux(knots[0]+epsilon)[0]*(x - knots[0])
             return B_aux(x)[0]
 
 
         def B_Prime(x):
             if x>knots[-1]:
-                print("B_Prime extrapolated at right")
                 print(B_Prime_aux(knots[-1]-epsilon)[0])
                 return B_Prime_aux(knots[-1]-epsilon)[0]
             elif x<knots[0]:
-                print("B_Prime extrapolated at left")
                 print(B_Prime_aux(knots[0]+epsilon)[0])
                 return B_Prime_aux(knots[0]+epsilon)[0]
             return B_Prime_aux(x)[0]
 
-        x_axis = np.linspace(knots[0], knots[-1], 500)
+        x_axis = np.linspace(knots[0]-5, knots[-1]+5, 700)
+        y_f = np.array([f(x) for x in x_axis])
         y_B = np.array([B(x) for x in x_axis])
         y_Bprime = np.array([B_Prime(x) for x in x_axis])
 
+        for k in knots:
+            plt.axvline(k, color='gray', linestyle='--', alpha=0.8)
+
+        plt.plot(x_axis, y_f, label="f(x)")
         plt.plot(x_axis, y_B, label="B(x)")
         plt.plot(x_axis, y_Bprime, label="B'(x)")
         plt.show()

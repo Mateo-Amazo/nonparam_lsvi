@@ -3,21 +3,28 @@ import matplotlib.pyplot as plt
 from splipy import Curve
 from variational.spline_estimation import get_BSpline_decomposition
 
-N = 100
+N = 10
 order = 4
 
 def f(x):
-    p1, mu1, sigma1 = 0.5, -3, 1
-    p2, mu2, sigma2 = 0.5, 3, 1
-    dens = (
-        p1 / (np.sqrt(2 * np.pi) * sigma1) * np.exp(-0.5 * ((x - mu1) / sigma1) ** 2)
-        + p2 / (np.sqrt(2 * np.pi) * sigma2) * np.exp(-0.5 * ((x - mu2) / sigma2) ** 2)
+    comps = [
+        (0.15, -6, 0.7),
+        (0.20, -2, 0.4),
+        (0.30,  0, 0.6),
+        (0.20,  3, 0.5),
+        (0.15,  6, 1.0),
+    ]
+    dens = sum(
+        p / (np.sqrt(2*np.pi)*s) * np.exp(-0.5*((x-m)/s)**2)
+        for p, m, s in comps
     )
     return np.log(dens)
 
 def f2(x):
-    mu, sigma = 0, 2
-    return -0.5 * np.log(2 * np.pi * sigma**2) - 0.5 * ((x - mu) / sigma) ** 2
+    main = -0.2 * (np.abs(x))
+    wiggle = 0.5 * np.sin(5*x)
+    dens = np.exp(main + wiggle)
+    return np.log(dens)
 
 X = np.linspace(-10, 10, N)
 
