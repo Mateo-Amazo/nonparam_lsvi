@@ -1,13 +1,14 @@
 import numpy as np
-
+import matplotlib.pyplot as plt
 from splipy import Curve
 
 from variational.data_generation import generate_data
 from variational.spline_estimation import get_BSpline_decomposition, get_beta_derivative
 from variational.optimization import find_mode
 
+epsilon = 1e-8
 
-def nonparam_lsvi(f, order=4, N=20, rho=0.5, eps=1e-1, Constraint=None):
+def nonparam_lsvi(f, order=4, N=20, rho=0.5, eps=1e-1, Constraint="Concavity"):
     
     init_mode = find_mode(f)
     X = np.random.normal(loc=init_mode, scale=1.0, size=N)
@@ -37,12 +38,25 @@ def nonparam_lsvi(f, order=4, N=20, rho=0.5, eps=1e-1, Constraint=None):
                 return B_aux(knots[0])[0] + B_Prime_aux(knots[0])[0]*(x - knots[0])
             return B_aux(x)[0]
 
+
         def B_Prime(x):
             if x>knots[-1]:
-                return B_Prime_aux(knots[-1])[0]
+                print("B_Prime extrapolated at right")
+                print(B_Prime_aux(knots[-1]-epsilon)[0])
+                return B_Prime_aux(knots[-1]-epsilon)[0]
             elif x<knots[0]:
-                return B_Prime_aux(knots[0])[0]
+                print("B_Prime extrapolated at left")
+                print(B_Prime_aux(knots[0]+epsilon)[0])
+                return B_Prime_aux(knots[0]+epsilon)[0]
             return B_Prime_aux(x)[0]
+
+        x_axis = np.linspace(knots[0], knots[-1], 500)
+        y_B = np.array([B(x) for x in x_axis])
+        y_Bprime = np.array([B_Prime(x) for x in x_axis])
+
+        plt.plot(x_axis, y_B, label="B(x)")
+        plt.plot(x_axis, y_Bprime, label="B'(x)")
+        plt.show()
 
         approxList.append(B)
 

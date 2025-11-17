@@ -40,8 +40,18 @@ def get_BSpline_decomposition(f, X, order=4, Constraint=None, a=None, b=None):
                            for j in range(N+M)] for i in range(N+M)])
         X_Tilde = np.matmul(X_Tilde, Sigma)
 
+
+
         lower_bounds = np.concatenate(([-np.inf], np.zeros(X_Tilde.shape[1] - 1)))
         upper_bounds = np.full(X_Tilde.shape[1], np.inf)
+
+
+        print("X_Tilde", X_Tilde.shape)
+        print("contains nan:", np.isnan(X_Tilde).any())
+        print("contains inf:", np.isinf(X_Tilde).any())
+        print("lower_bounds", lower_bounds.shape)
+        print("upper_bounds", upper_bounds.shape)
+        print("f_X", f_X.shape)
 
         res = lsq_linear(X_Tilde, f_X, bounds=(lower_bounds, upper_bounds))
         beta = np.matmul(Sigma, res.x)

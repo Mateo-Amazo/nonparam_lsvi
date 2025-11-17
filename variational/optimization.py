@@ -5,13 +5,14 @@ def find_mode(B):
     return res.x[0]
 
 def find_sz(B, rho):
-    
     def gs(x):
-        return B(-x)+rho
+        return B(-x) + rho
+
     s = fsolve(gs, x0=0)[0]
 
     def gz(x):
-        return B(x)+rho
+        return B(x) + rho
+
     z = fsolve(gz, x0=0)[0]
 
     return s, z

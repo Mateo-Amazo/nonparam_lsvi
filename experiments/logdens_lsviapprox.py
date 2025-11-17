@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 from variational.nonparam_lsvi import nonparam_lsvi
 
 
-N = 10
+N = 30
 order = 4
-rho = 1
+rho = 0
 eps = 1
 
 def f(x):
@@ -18,5 +18,5 @@ def f(x):
     )
     return np.log(dens)
 
-approxList = nonparam_lsvi(f, order=order, eps=eps, N=N, rho=rho, Constraint="Concavity")
+approxList = nonparam_lsvi(f, order=order, eps=eps, N=N, rho=rho)
 print(len(approxList))

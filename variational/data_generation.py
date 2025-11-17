@@ -21,6 +21,9 @@ def generate_data(B, B_Prime, N, rho):
     z_tilde, s_tilde = z - r*rho, s - p*rho
     q = z_tilde + s_tilde
 
+    print("Generating data with parameters:")
+    print(f"mode: {mode}, s: {s}, z: {z}, ksi: {ksi}, dzeta: {dzeta}")
+
     samples = []
 
     for k in range(N):
