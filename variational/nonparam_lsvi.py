@@ -41,10 +41,8 @@ def nonparam_lsvi(f, order=4, N=20, rho=0.5, eps=1e-1, Constraint="Concavity"):
 
         def B_Prime(x):
             if x>knots[-1]:
-                print(B_Prime_aux(knots[-1]-epsilon)[0])
                 return B_Prime_aux(knots[-1]-epsilon)[0]
             elif x<knots[0]:
-                print(B_Prime_aux(knots[0]+epsilon)[0])
                 return B_Prime_aux(knots[0]+epsilon)[0]
             return B_Prime_aux(x)[0]
 
@@ -69,7 +67,9 @@ def nonparam_lsvi(f, order=4, N=20, rho=0.5, eps=1e-1, Constraint="Concavity"):
 
         X = generate_data(B, B_Prime, N, rho)
 
-        Delta = np.mean(np.diff(X))
+        #Delta = np.mean(np.diff(X))
+        #a = np.min([a, X[0]-Delta])
+        #b = np.max([b, X[-1]+Delta]) 
 
-        a = np.min([a, X[0]-Delta])
-        b = np.max([b, X[-1]+Delta]) 
+        a = X[0]
+        b = X[-1]

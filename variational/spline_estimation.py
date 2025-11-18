@@ -16,7 +16,7 @@ def aux_concavity_matrix(i,j):
     if j>=3 and i>=j:
         return j-i-1
 
-def get_BSpline_decomposition(f, X, order=4, Constraint=None, a=None, b=None):
+def get_BSpline_decomposition(f, X, order=4, Constraint="Concavity", a=None, b=None):
 
     N = len(X)
     M = order

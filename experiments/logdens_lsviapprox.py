@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from variational.nonparam_lsvi import nonparam_lsvi
 
 
-N = 10
+N = 1000
 order = 4
 rho = 0
 eps = 1
