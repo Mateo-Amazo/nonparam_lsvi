@@ -36,4 +36,4 @@ plt.plot(x_axis, y_axis_derivative, label="Spline Derivative")
 plt.plot(x_axis, y_true, "--")
 plt.legend()
 
-plt.savefig("graphs/density_splinederivapproximation_" + str(N) + "points_" + str(order) + "order_2.png")
+plt.savefig("graphs/logdensity_splineapproxderiv_" + str(N) + "points_" + str(order) + "order_2.png")

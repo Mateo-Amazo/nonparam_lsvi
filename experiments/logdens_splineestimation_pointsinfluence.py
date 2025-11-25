@@ -60,4 +60,4 @@ plt.ylim(-15, 5)
 plt.xlim(-20, 20)
 plt.legend()
 
-plt.savefig("graphs/density_spline_approximations_pointsinfluence_" + str(N) + "points_" + str(order) + "order_2.png")
+plt.savefig("graphs/approximations_pointsinfluence_" + str(N) + "points_" + str(order) + "order_2.png")

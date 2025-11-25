@@ -58,4 +58,4 @@ plt.plot(x_axis, y_B, label="B(x)")
 plt.plot(x_axis, y_Bprime, label="B'(x)")
 plt.legend()
 
-plt.savefig("graphs/density_splineapproxsampling_" + str(N) + "points_" + str(order) + "order.png")
+plt.savefig("graphs/splineapprox_sampling_" + str(N) + "points_" + str(order) + "order.png")

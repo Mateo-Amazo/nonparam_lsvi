@@ -51,4 +51,4 @@ plt.plot(x_axis2, y_axis2)
 plt.plot(x_axis2, y_true2, "--")
 plt.legend()
 
-plt.savefig("graphs/density_spline_approximations_" + str(N) + "points_" + str(order) + "order.png")
+plt.savefig("graphs/logdensity_splineapprox_" + str(N) + "points_" + str(order) + "order.png")
