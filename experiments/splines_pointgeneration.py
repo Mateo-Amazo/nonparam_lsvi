@@ -29,6 +29,7 @@ B_aux = Curve(BSpline_Basis, Beta.reshape(-1, 1)).evaluate
 B_Prime_aux = Curve(BSpline_Basis_lower, Beta_deriv.reshape(-1, 1)).evaluate
 
 def B(x):
+    print(B_aux(knots[-1]-epsilon)[0])
     if x>knots[-1]:
         return B_aux(knots[-1]-epsilon)[0] + B_Prime_aux(knots[-1]-epsilon)[0]*(x - knots[-1])
     elif x<knots[0]:
