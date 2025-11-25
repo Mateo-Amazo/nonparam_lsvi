@@ -4,9 +4,13 @@ from splipy import Curve
 
 from variational.spline_estimation import get_BSpline_decomposition
 
-N = 10
+N = 2
 order = 4
 epsilon = 1e-10
+
+N = 100
+order = 4
+rho = 0
 
 def f(x):
     main = -0.2 * (np.abs(x))
@@ -14,8 +18,7 @@ def f(x):
     dens = np.exp(main + wiggle)
     return np.log(dens)
 
-X = np.random.normal(0, 3, size=N)
-X = np.sort(X)
+X = np.linspace(-10, 10, N)
 
 Beta, BSpline_Basis, _ = get_BSpline_decomposition(f, X, order=order, Constraint="Concavity")
 approx_curve = Curve(BSpline_Basis, Beta.reshape(-1, 1))
@@ -43,7 +46,7 @@ def B(x):
     return approx_curve.evaluate(x)[0]
 
 
-x_axis = np.linspace(-20, 20, 1000)
+x_axis = X
 y_axis1 = np.array([B(x) for x in x_axis])
 y_axis1_deriv = np.array([B_Prime(x) for x in x_axis])
 y_true1 = f(x_axis)
@@ -53,9 +56,9 @@ plt.figure(figsize=(8, 5))
 for k in X:
     plt.axvline(k, color='gray', linestyle='--', alpha=1)
 
-plt.plot(x_axis, y_axis1)
-plt.plot(x_axis, y_true1, "--")
-plt.plot(x_axis, y_axis1_deriv)
+plt.plot(x_axis, y_axis1, label="B(x)")
+plt.plot(x_axis, y_true1, "--", label="f(x)")
+plt.plot(x_axis, y_axis1_deriv, label="B'(x)")
 plt.ylim(-15, 5)
 plt.xlim(-20, 20)
 plt.legend()
