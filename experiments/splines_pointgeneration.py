@@ -1,15 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
-import splipy
 from splipy import Curve
 
-from variational.spline_estimation import get_BSpline_decomposition, get_beta_derivative
+from variational.spline_estimation import get_BSpline_decomposition
 from variational.data_generation import generate_data
 
-N = 10
+N = 100
 order = 4
-epsilon = 1e-10
 rho = 0
 
 def f(x):
@@ -21,36 +18,37 @@ def f(x):
 X = np.linspace(-10, 10, N)
 
 Beta, BSpline_Basis, _ = get_BSpline_decomposition(f, X, order=order, Constraint="Concavity")
-Beta_deriv = get_beta_derivative(Beta, BSpline_Basis.knots, order)
+approx_curve = Curve(BSpline_Basis, Beta.reshape(-1, 1))
 knots = BSpline_Basis.knots
-BSpline_Basis_lower = splipy.BSplineBasis(order=order-1, knots=knots)
 
-B_aux = Curve(BSpline_Basis, Beta.reshape(-1, 1)).evaluate
-B_Prime_aux = Curve(BSpline_Basis_lower, Beta_deriv.reshape(-1, 1)).evaluate
+deriv_matrix = BSpline_Basis.evaluate(knots[order], d=1)[0]
+Deriv_right = (deriv_matrix @ Beta.reshape(-1,1))[0]
 
-def B(x):
-    print(B_aux(knots[-1]-epsilon)[0])
-    if x>knots[-1]:
-        return B_aux(knots[-1]-epsilon)[0] + B_Prime_aux(knots[-1]-epsilon)[0]*(x - knots[-1])
-    elif x<knots[0]:
-        return B_aux(knots[0]+epsilon)[0] + B_Prime_aux(knots[0]+epsilon)[0]*(x - knots[0])
-    return B_aux(x)[0]
-
+deriv_matrix = BSpline_Basis.evaluate(knots[order+N], d=1)[0]
+Deriv_left = (deriv_matrix @ Beta.reshape(-1,1))[0]
 
 def B_Prime(x):
-    if x>knots[-1]:
-        return B_Prime_aux(knots[-1]-epsilon)[0]
-    elif x<knots[0]:
-        return B_Prime_aux(knots[0]+epsilon)[0]
-    return B_Prime_aux(x)[0]
+    if x>knots[order+N]:
+        return Deriv_right
+    elif x<knots[order]:
+        return Deriv_left
+    deriv_matrix = BSpline_Basis.evaluate(x, d=1)[0]
+    return (deriv_matrix @ Beta.reshape(-1,1))[0]
 
+def B(x):
+    if x>knots[order+N]:
+        return B_Prime(knots[order+N])*(x - knots[-1]) + approx_curve.evaluate(knots[order+N])[0]
+    elif x<knots[order]:
+        return B_Prime(knots[order])*(x - knots[0]) + approx_curve.evaluate(knots[order])[0]
+    return approx_curve.evaluate(x)[0]
 
 X2 = generate_data(B, B_Prime, N, rho)
 
-x_axis = np.linspace(X2[0], X2[-1], 100)
+x_axis = X
 y_f = np.array([f(x) for x in x_axis])
 y_B = np.array([B(x) for x in x_axis])
 y_Bprime = np.array([B_Prime(x) for x in x_axis])
+
 
 for k in X2:
     plt.axvline(k, color='gray', linestyle='--', alpha=0.8)
@@ -58,4 +56,6 @@ for k in X2:
 plt.plot(x_axis, y_f, label="f(x)")
 plt.plot(x_axis, y_B, label="B(x)")
 plt.plot(x_axis, y_Bprime, label="B'(x)")
-plt.show()
+plt.legend()
+
+plt.savefig("graphs/density_splineapproxsampling_" + str(N) + "points_" + str(order) + "order.png")

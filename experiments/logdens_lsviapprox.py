@@ -1,6 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
-
 from variational.nonparam_lsvi import nonparam_lsvi
 
 

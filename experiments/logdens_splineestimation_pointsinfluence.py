@@ -1,9 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from splipy import Curve
-import splipy
 
-from variational.spline_estimation import get_BSpline_decomposition, get_beta_derivative
+from variational.spline_estimation import get_BSpline_decomposition
 
 N = 10
 order = 4
@@ -19,27 +18,28 @@ X = np.random.normal(0, 3, size=N)
 X = np.sort(X)
 
 Beta, BSpline_Basis, _ = get_BSpline_decomposition(f, X, order=order, Constraint="Concavity")
-knots = BSpline_Basis.knots
 approx_curve = Curve(BSpline_Basis, Beta.reshape(-1, 1))
-
-Beta_deriv = get_beta_derivative(Beta, BSpline_Basis.knots, N, order)
 knots = BSpline_Basis.knots
-BSpline_Basis_lower = splipy.BSplineBasis(order=order-1, knots=knots)
-approx_curve_deriv = Curve(BSpline_Basis_lower, Beta_deriv.reshape(-1, 1))
 
+deriv_matrix = BSpline_Basis.evaluate(knots[order], d=1)[0]
+Deriv_right = (deriv_matrix @ Beta.reshape(-1,1))[0]
+
+deriv_matrix = BSpline_Basis.evaluate(knots[order+N], d=1)[0]
+Deriv_left = (deriv_matrix @ Beta.reshape(-1,1))[0]
 
 def B_Prime(x):
-    if x>knots[-1]:
-        return approx_curve_deriv.evaluate(knots[-1]-epsilon)[0]
-    elif x<knots[0]:
-        return approx_curve_deriv.evaluate(knots[0]+epsilon)[0]
-    return approx_curve_deriv.evaluate(x)[0]
+    if x>knots[order+N]:
+        return Deriv_right
+    elif x<knots[order]:
+        return Deriv_left
+    deriv_matrix = BSpline_Basis.evaluate(x, d=1)[0]
+    return (deriv_matrix @ Beta.reshape(-1,1))[0]
 
 def B(x):
-    if x>knots[-1]:
-        return approx_curve.evaluate(knots[-1]-epsilon)[0] + approx_curve_deriv.evaluate(knots[-1]-epsilon)[0]*(x - knots[-1])
-    elif x<knots[0]:
-        return approx_curve.evaluate(knots[0]+epsilon)[0] + approx_curve_deriv.evaluate(knots[0]+epsilon)[0]*(x - knots[0])
+    if x>knots[order+N]:
+        return B_Prime(knots[order+N])*(x - knots[-1]) + approx_curve.evaluate(knots[order+N])[0]
+    elif x<knots[order]:
+        return B_Prime(knots[order])*(x - knots[0]) + approx_curve.evaluate(knots[order])[0]
     return approx_curve.evaluate(x)[0]
 
 

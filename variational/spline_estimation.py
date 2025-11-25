@@ -55,16 +55,3 @@ def get_BSpline_decomposition(f, X, order=4, Constraint="Concavity", a=None, b=N
         raise ValueError("Constraint not recognized")
 
     return beta, BSpline_Basis, BSpline_Basis_lower
-
-def get_beta_derivative(beta, knots, order):
-    beta = np.asarray(beta).reshape(-1)
-    beta_deriv = np.zeros(len(beta))
-
-    denom = knots[order] - knots[1]
-    beta_deriv[0] = (beta[1] - beta[0]) / denom if denom != 0 else 0.0
-
-    for i in range(0, len(beta)-1):
-        denom = knots[i + order] - knots[i + 1]
-        beta_deriv[i] = (beta[i + 1] - beta[i]) / denom if denom != 0 else 0.0
-
-    return order*beta_deriv
