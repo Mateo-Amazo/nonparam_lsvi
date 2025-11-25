@@ -56,13 +56,15 @@ def get_BSpline_decomposition(f, X, order=4, Constraint="Concavity", a=None, b=N
 
     return beta, BSpline_Basis, BSpline_Basis_lower
 
-def get_beta_derivative(beta, knots, N, order):
+def get_beta_derivative(beta, knots, order):
+    beta = np.asarray(beta).reshape(-1)
+    beta_deriv = np.zeros(len(beta))
 
-    beta_deriv = [0 for k in range(N+order+1)]
-    beta_deriv[0] = beta[0]/(knots[order-1]-knots[0]) if knots[order-1]!=knots[0] else 0
-    beta_deriv[-1] = -beta[N+order-1]/(knots[N+2*order-1]-knots[N+order]) if knots[N+2*order-1]!=knots[N+order] else 0
+    denom = knots[order] - knots[1]
+    beta_deriv[0] = (beta[1] - beta[0]) / denom if denom != 0 else 0.0
 
-    for i in range(1, N+order-1):
-        beta_deriv[i] = (beta[i]-beta[i-1])/(knots[i+order-1]-knots[i]) if knots[i+order-1]!=knots[i] else 0
+    for i in range(0, len(beta)-1):
+        denom = knots[i + order] - knots[i + 1]
+        beta_deriv[i] = (beta[i + 1] - beta[i]) / denom if denom != 0 else 0.0
 
-    return order*np.array(beta_deriv)
+    return order*beta_deriv

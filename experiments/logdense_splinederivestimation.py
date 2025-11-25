@@ -16,7 +16,7 @@ def f(x):
 X = np.linspace(-10, 10, N)
 
 Beta, BSpline_Basis1, _ = get_BSpline_decomposition(f, X, order=order, Constraint="Concavity")
-Beta_derivative = get_beta_derivative(Beta, BSpline_Basis1.knots, N, order)
+Beta_derivative = get_beta_derivative(Beta, BSpline_Basis1.knots, order)
 knots = BSpline_Basis1.knots
 BSpline_Basis_lower = splipy.BSplineBasis(order=order-1, knots=knots)
 
