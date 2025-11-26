@@ -2,7 +2,7 @@ import numpy as np
 from variational.optimization import find_mode, find_sz
 
 def Chi(x, rho, s_tilde, z_tilde, dzeta, ksi):
-    return (1 if (-s_tilde <= x <= z_tilde) else 0) + (np.exp(-rho-dzeta*(x-z_tilde)) if x>=z_tilde else 0) + (np.exp(-rho+ksi*(x+s_tilde)) if x<=-s_tilde else 0)
+    return (1 if (-s_tilde <= x <= z_tilde) else 0) + (np.exp(-rho-dzeta*(x-z_tilde)) if x>z_tilde else 0) + (np.exp(-rho+ksi*(x+s_tilde)) if x<-s_tilde else 0)
 
 def Phi(x, B, mode):
     return B(mode+x)-B(mode)
@@ -23,8 +23,8 @@ def generate_data(B, B_Prime, N, rho):
     z_tilde, s_tilde = z - r*rho, s - p*rho
     q = z_tilde + s_tilde
 
-    #print("Generating data with parameters:")
-    #print(f"mode: {mode}, s: {s}, s_tilde: {s_tilde}, z: {z}, z_tilde: {z_tilde}, ksi: {ksi}, dzeta: {dzeta}")
+    print("Generating data with parameters:")
+    print(f"mode: {mode}, s: {s}, s_tilde: {s_tilde}, z: {z}, z_tilde: {z_tilde}, ksi: {ksi}, dzeta: {dzeta}")
 
     samples = []
 
@@ -40,10 +40,10 @@ def generate_data(B, B_Prime, N, rho):
             W = np.random.uniform(0,1)
 
 
-            if U*(q + p + r) <= q:
+            if U*(p + q + r) < q:
                 x = -s_tilde + q*V
 
-            elif U*(q + p + r) <= (q + p):
+            elif U*(p + q + r) < (q + p):
                 x = z_tilde - r*np.log(V)
 
             else:

@@ -25,16 +25,18 @@ def get_BSpline_decomposition(f, X, order=4, Constraint="Concavity", a=None, b=N
     knots = np.concatenate([[a for i in range(order)], sorted_X, [b for i in range(order)]])
 
 
-    f_X = f(sorted_X)
+    f_X = f(knots)
     BSpline_Basis = splipy.BSplineBasis(order=order, knots=knots)
     BSpline_Basis_lower = splipy.BSplineBasis(order=order-1, knots=knots)
 
-    X_Tilde = np.array([BSpline_Basis.evaluate(x)[0] for x in sorted_X])
+    X_Tilde = np.array([BSpline_Basis.evaluate(x)[0] for x in knots])
 
     if Constraint == "Concavity":
 
         Sigma = np.array([[aux_concavity_matrix(i+1, j+1)
                            for j in range(N+M)] for i in range(N+M)])
+
+        #print(Sigma)
         X_Tilde = np.matmul(X_Tilde, Sigma)
 
 
