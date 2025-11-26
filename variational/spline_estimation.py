@@ -2,10 +2,6 @@ import numpy as np
 import splipy
 from scipy.optimize import lsq_linear
 
-
-def f(x):
-    return -0.5 * np.log(2 * np.pi) - 0.5 * x**2
-
 def aux_concavity_matrix(i,j):
     if i<j:
         return 0
@@ -36,6 +32,7 @@ def get_BSpline_decomposition(f, X, order=4, Constraint="Concavity", a=None, b=N
     X_Tilde = np.array([BSpline_Basis.evaluate(x)[0] for x in sorted_X])
 
     if Constraint == "Concavity":
+
         Sigma = np.array([[aux_concavity_matrix(i+1, j+1)
                            for j in range(N+M)] for i in range(N+M)])
         X_Tilde = np.matmul(X_Tilde, Sigma)
@@ -54,4 +51,4 @@ def get_BSpline_decomposition(f, X, order=4, Constraint="Concavity", a=None, b=N
     else:
         raise ValueError("Constraint not recognized")
 
-    return beta, BSpline_Basis, BSpline_Basis_lower
+    return beta.reshape(-1,1), BSpline_Basis, BSpline_Basis_lower

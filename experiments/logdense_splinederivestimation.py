@@ -20,7 +20,7 @@ knots = BSpline_Basis.knots
 
 def B_Prime(x):
     deriv_matrix = BSpline_Basis.evaluate(x, d=1)[0]
-    return (deriv_matrix @ Beta.reshape(-1,1))[0]
+    return (deriv_matrix @ Beta)[0]
 
 def B(x):
     return approx_curve.evaluate(x)[0]

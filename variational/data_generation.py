@@ -13,7 +13,9 @@ def Phi_prime(x, B_Prime, mode):
 def generate_data(B, B_Prime, N, rho):
 
     mode = find_mode(B)
-    s, z = find_sz(B, rho)
+
+
+    s, z = find_sz(lambda x: Phi(x, B, mode), rho)
 
     dzeta, ksi = -Phi_prime(z, B_Prime, mode), Phi_prime(-s, B_Prime, mode)
 
@@ -21,8 +23,8 @@ def generate_data(B, B_Prime, N, rho):
     z_tilde, s_tilde = z - r*rho, s - p*rho
     q = z_tilde + s_tilde
 
-    print("Generating data with parameters:")
-    print(f"mode: {mode}, s: {s}, s_tilde: {s_tilde}, z: {z}, z_tilde: {z_tilde}, ksi: {ksi}, dzeta: {dzeta}")
+    #print("Generating data with parameters:")
+    #print(f"mode: {mode}, s: {s}, s_tilde: {s_tilde}, z: {z}, z_tilde: {z_tilde}, ksi: {ksi}, dzeta: {dzeta}")
 
     samples = []
 
