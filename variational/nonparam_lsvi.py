@@ -22,29 +22,22 @@ def nonparam_lsvi(f, order=4, N=20, rho=0.5, eps=1e-1, Constraint="Concavity"):
 
     while True:
         
-        Beta, BSpline_Basis, _ = get_BSpline_decomposition(f=f, X=X, order=order, Constraint=Constraint)
-        approx_curve = Curve(BSpline_Basis, Beta.reshape(-1, 1))
+        Beta, BSpline_Basis, _ = get_BSpline_decomposition(f, X, order=order, Constraint=Constraint, a=a, b=b)
+        approx_curve = Curve(BSpline_Basis, Beta)
         knots = BSpline_Basis.knots
-
-        deriv_matrix = BSpline_Basis.evaluate(knots[order], d=1)[0]
-        Deriv_right = (deriv_matrix @ Beta.reshape(-1,1))[0]
-
-        deriv_matrix = BSpline_Basis.evaluate(knots[order+N], d=1)[0]
-        Deriv_left = (deriv_matrix @ Beta.reshape(-1,1))[0]
 
         def B_Prime(x):
             if x>knots[order+N]:
-                return Deriv_right
+                return (BSpline_Basis.evaluate(knots[order+N], d=1)[0] @ Beta)[0]
             elif x<knots[order]:
-                return Deriv_left
-            deriv_matrix = BSpline_Basis.evaluate(x, d=1)[0]
-            return (deriv_matrix @ Beta.reshape(-1,1))[0]
+                return (BSpline_Basis.evaluate(knots[order], d=1)[0] @ Beta)[0]
+            return (BSpline_Basis.evaluate(x, d=1)[0] @ Beta)[0]
 
         def B(x):
             if x>knots[order+N]:
-                return B_Prime(knots[order+N])*(x - knots[-1]) + approx_curve.evaluate(knots[order+N])[0]
+                return B_Prime(knots[order+N])*(x - knots[order+N]) + approx_curve.evaluate(knots[order+N])[0]
             elif x<knots[order]:
-                return B_Prime(knots[order])*(x - knots[0]) + approx_curve.evaluate(knots[order])[0]
+                return B_Prime(knots[order])*(x - knots[order]) + approx_curve.evaluate(knots[order])[0]
             return approx_curve.evaluate(x)[0]
 
         x_axis = np.linspace(knots[0]-5, knots[-1]+5, 700)
