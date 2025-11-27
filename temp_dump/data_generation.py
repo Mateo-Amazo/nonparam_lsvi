@@ -1,5 +1,5 @@
 import numpy as np
-from variational.optimization import find_mode, find_sz
+from experiments.graphs.optimization import find_mode, find_sz
 
 def Chi(x, rho, s_tilde, z_tilde, dzeta, ksi):
     return (1 if (-s_tilde <= x <= z_tilde) else 0) + (np.exp(-rho-dzeta*(x-z_tilde)) if x>z_tilde else 0) + (np.exp(-rho+ksi*(x+s_tilde)) if x<-s_tilde else 0)

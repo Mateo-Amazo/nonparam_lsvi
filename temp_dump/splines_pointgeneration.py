@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from splipy import Curve
 
 from variational.spline_estimation import get_BSpline_decomposition
-from variational.data_generation import generate_data
+from temp_dump.data_generation import generate_data
 
 N = 10
 N2 = 100

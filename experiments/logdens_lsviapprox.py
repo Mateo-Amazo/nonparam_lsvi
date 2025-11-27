@@ -1,20 +1,18 @@
 import numpy as np
 from variational.nonparam_lsvi import nonparam_lsvi
+from experiments.problems import log_gaussian, log_shifted_scaled_gaussian, log_mixture_of_gaussian
+from variational.laplace import laplace_approximation
 
-
-N = 1000
+N = 50
 order = 4
-rho = 0
+rho = 0.5
 eps = 1
 
-def f(x):
-    p1, mu1, sigma1 = 0.5, -3, 1
-    p2, mu2, sigma2 = 0.5, 3, 1
-    dens = (
-        p1 / (np.sqrt(2 * np.pi) * sigma1) * np.exp(-0.5 * ((x - mu1) / sigma1) ** 2)
-        + p2 / (np.sqrt(2 * np.pi) * sigma2) * np.exp(-0.5 * ((x - mu2) / sigma2) ** 2)
-    )
-    return np.log(dens)+10
-
-approxList = nonparam_lsvi(f, order=order, eps=eps, N=N, rho=rho)
-print(len(approxList))
+my_log_density = log_mixture_of_gaussian
+_, mode, hess_inv_at_mode = laplace_approximation(log_density=my_log_density, init=0.)
+my_initial_sampler = lambda n: mode + np.linalg.cholesky(hess_inv_at_mode) @ np.random.multivariate_normal(mean=mode,
+                                                                                                           cov=np.eye(
+                                                                                                               mode.shape[
+                                                                                                                   0]),
+                                                                                                           size=n).T
+samples = nonparam_lsvi(my_log_density, mode, my_initial_sampler, order=order, eps=eps, N=N, rho=rho)
