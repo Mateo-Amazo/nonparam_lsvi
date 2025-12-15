@@ -12,7 +12,7 @@ def aux_concavity_matrix(i,j):
     if j>=3 and i>=j:
         return j-i-1
 
-def get_BSpline_decomposition(f, X, order=4, Constraint="Concavity", a=None, b=None):
+def get_BSpline_decomposition(f, X, order=4, Constraint="Concavity", a=None, b=None, lam = 1e-2):
 
     N = len(X)
     M = order
@@ -31,21 +31,38 @@ def get_BSpline_decomposition(f, X, order=4, Constraint="Concavity", a=None, b=N
 
     X_Tilde = np.array([BSpline_Basis.evaluate(x)[0] for x in knots])
 
+
     if Constraint == "Concavity":
 
-        Sigma = np.array([[aux_concavity_matrix(i+1, j+1)
-                           for j in range(N+M)] for i in range(N+M)])
+        Sigma = np.fromfunction(
+            np.vectorize(lambda i, j: aux_concavity_matrix(i+1, j+1)),
+            (N+M, N+M),
+            dtype=int
+        )
 
-        #print(Sigma)
-        X_Tilde = np.matmul(X_Tilde, Sigma)
+        A = X_Tilde @ Sigma
+
+        D = np.eye(N+M, k=1) - np.eye(N+M)
+        D = D[:-1]
 
 
+        A_aug = np.vstack([
+            A,
+            np.sqrt(lam) * (D @ Sigma)
+        ])
 
-        lower_bounds = np.concatenate(([-np.inf], np.zeros(X_Tilde.shape[1] - 1)))
-        upper_bounds = np.full(X_Tilde.shape[1], np.inf)
+        y_aug = np.concatenate([
+            f_X,
+            np.zeros(D.shape[0])
+        ])
 
-        res = lsq_linear(X_Tilde, f_X, bounds=(lower_bounds, upper_bounds))
-        beta = np.matmul(Sigma, res.x)
+        lower_bounds = np.concatenate(([-np.inf], np.zeros(A.shape[1] - 1)))
+        upper_bounds = np.full(A.shape[1], np.inf)
+
+        res = lsq_linear(A_aug, y_aug, bounds=(lower_bounds, upper_bounds))
+
+        beta = Sigma @ res.x
+
 
     elif Constraint is None:
         beta = lsq_linear(X_Tilde, f_X)

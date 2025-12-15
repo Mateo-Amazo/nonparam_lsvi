@@ -19,6 +19,7 @@ def nonparam_lsvi(f, initial_mode, initial_sampler, order=4, N=20, rho=0.5, eps=
     b = my_samples[-1]
 
     j = 0
+
     while True and j < max_iter:
         Beta, BSpline_Basis, _ = get_BSpline_decomposition(f=f, X=my_samples, order=order, Constraint=Constraint)
         approx_curve = Curve(BSpline_Basis, Beta.reshape(-1, 1))
