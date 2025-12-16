@@ -23,3 +23,10 @@ def log_mixture_of_gaussian(x, means=np.array([-1, 2]), var=np.array([1, 1.5])):
 def sin_sum(x):
 
     return 0.7*np.sin(2*x) + 0.3*np.sin(7*x)
+
+def piecewise_wavy(x):
+    left = 0.5 * x + 2
+    right = -0.5 * x + 2
+
+    envelope = np.minimum(left, right)
+    return envelope + 0.3 * np.sin(8 * x)

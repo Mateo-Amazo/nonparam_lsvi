@@ -12,38 +12,42 @@ def aux_concavity_matrix(i,j):
     if j>=3 and i>=j:
         return j-i-1
 
-def get_BSpline_decomposition(f, X, order=4, Constraint="Concavity", a=None, b=None, lam = 1e-2):
+def get_BSpline_decomposition(f, X, order=4, Constraint="Concavity", knots=None, a=None, b=None, lam = 1e-2):
 
-    N = len(X)
-    M = order
     sorted_X = np.sort(X)
 
     if a is None or b is None:
         a = sorted_X[0]
         b = sorted_X[-1]
 
-    knots = np.concatenate([[a for i in range(order)], sorted_X, [b for i in range(order)]])
+    if knots is None:
 
+        knots = np.concatenate([[a for i in range(order)], sorted_X, [b for i in range(order)]])
 
-    f_X = f(knots)
+    K = len(knots) - order
+
     BSpline_Basis = splipy.BSplineBasis(order=order, knots=knots)
-    BSpline_Basis_lower = splipy.BSplineBasis(order=order-1, knots=knots)
 
-    X_Tilde = np.array([BSpline_Basis.evaluate(x)[0] for x in knots])
+    f_X = f(X)
+    X_Tilde = BSpline_Basis.evaluate(X)
+
+    D = np.eye(K, k=1) - np.eye(K)
+    D = D[:-1]
+    y_aug = np.concatenate([
+        f_X,
+        np.zeros(D.shape[0])
+    ])
 
 
     if Constraint == "Concavity":
 
         Sigma = np.fromfunction(
             np.vectorize(lambda i, j: aux_concavity_matrix(i+1, j+1)),
-            (N+M, N+M),
+            (K, K),
             dtype=int
         )
 
         A = X_Tilde @ Sigma
-
-        D = np.eye(N+M, k=1) - np.eye(N+M)
-        D = D[:-1]
 
 
         A_aug = np.vstack([
@@ -51,10 +55,6 @@ def get_BSpline_decomposition(f, X, order=4, Constraint="Concavity", a=None, b=N
             np.sqrt(lam) * (D @ Sigma)
         ])
 
-        y_aug = np.concatenate([
-            f_X,
-            np.zeros(D.shape[0])
-        ])
 
         lower_bounds = np.concatenate(([-np.inf], np.zeros(A.shape[1] - 1)))
         upper_bounds = np.full(A.shape[1], np.inf)
@@ -65,7 +65,13 @@ def get_BSpline_decomposition(f, X, order=4, Constraint="Concavity", a=None, b=N
 
 
     elif Constraint is None:
-        beta = lsq_linear(X_Tilde, f_X)
+
+        X_Tilde_aug = np.vstack([
+            X_Tilde,
+            np.sqrt(lam) * D 
+            ])
+
+        beta = lsq_linear(X_Tilde_aug, y_aug).x
 
     else:
         raise ValueError("Constraint not recognized")

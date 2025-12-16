@@ -9,7 +9,7 @@ from variational.optimization import find_mode
 epsilon = 0.5
 
 
-def nonparam_lsvi(f, initial_mode, initial_sampler, order=4, N=20, rho=0.5, eps=1e-1, Constraint="Concavity",
+def nonparam_lsvi(f, initial_mode, initial_sampler, order=4, N=20, rho=0.5, lam=1e-2, Constraint="Concavity",
                   max_iter=10):
     samples_across_iteration = np.zeros((N, max_iter))
     my_mode = initial_mode
@@ -21,7 +21,7 @@ def nonparam_lsvi(f, initial_mode, initial_sampler, order=4, N=20, rho=0.5, eps=
     j = 0
 
     while True and j < max_iter:
-        Beta, BSpline_Basis = get_BSpline_decomposition(f=f, X=my_samples, order=order, Constraint=Constraint)
+        Beta, BSpline_Basis = get_BSpline_decomposition(f=f, X=my_samples, order=order, Constraint=Constraint, lam=lam)
         approx_curve = Curve(BSpline_Basis, Beta)
         knots = BSpline_Basis.knots
 
