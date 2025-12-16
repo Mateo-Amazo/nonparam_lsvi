@@ -70,4 +70,4 @@ def get_BSpline_decomposition(f, X, order=4, Constraint="Concavity", a=None, b=N
     else:
         raise ValueError("Constraint not recognized")
 
-    return beta.reshape(-1,1), BSpline_Basis, BSpline_Basis_lower
+    return beta.reshape(-1,1), BSpline_Basis

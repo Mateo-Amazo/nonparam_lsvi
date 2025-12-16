@@ -21,15 +21,15 @@ def nonparam_lsvi(f, initial_mode, initial_sampler, order=4, N=20, rho=0.5, eps=
     j = 0
 
     while True and j < max_iter:
-        Beta, BSpline_Basis, _ = get_BSpline_decomposition(f=f, X=my_samples, order=order, Constraint=Constraint)
-        approx_curve = Curve(BSpline_Basis, Beta.reshape(-1, 1))
+        Beta, BSpline_Basis = get_BSpline_decomposition(f=f, X=my_samples, order=order, Constraint=Constraint)
+        approx_curve = Curve(BSpline_Basis, Beta)
         knots = BSpline_Basis.knots
 
         deriv_matrix = BSpline_Basis.evaluate(knots[order], d=1)[0]
-        Deriv_right = (deriv_matrix @ Beta.reshape(-1, 1))[0]
+        Deriv_right = (deriv_matrix @ Beta)[0]
 
         deriv_matrix = BSpline_Basis.evaluate(knots[order + N], d=1)[0]
-        Deriv_left = (deriv_matrix @ Beta.reshape(-1, 1))[0]
+        Deriv_left = (deriv_matrix @ Beta)[0]
 
         def B_Prime(x):
             if x > knots[order + N]:
