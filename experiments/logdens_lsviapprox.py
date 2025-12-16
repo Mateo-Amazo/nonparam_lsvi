@@ -6,7 +6,7 @@ from variational.laplace import laplace_approximation
 N = 50
 order = 4
 rho = 0.5
-lam = 1e-2
+lam = 1e-0
 
 my_log_density = log_mixture_of_gaussian
 _, mode, hess_inv_at_mode = laplace_approximation(log_density=my_log_density, init=0.)

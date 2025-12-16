@@ -50,5 +50,5 @@ plt.hist(
     alpha=0.3
 )
 
-plt.show()
+plt.savefig('experiments/graphs/log_concave_sampler.png')
 

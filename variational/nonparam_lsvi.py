@@ -56,7 +56,7 @@ def nonparam_lsvi(f, initial_mode, initial_sampler, order=4, N=20, rho=0.5, lam=
         plt.plot(x_axis, np.exp(y_f), label="f(x)")
         plt.plot(x_axis, np.exp(y_B), label="B(x)")
         plt.legend()
-        plt.savefig(f'experiments/graphs/{j}.png')
+        plt.savefig(f'experiments/graphs/lsvi_steps/{j}.png')
         plt.close()
 
         # if np.abs(Beta[0]) < eps and np.abs(Beta[-1]) < eps:
