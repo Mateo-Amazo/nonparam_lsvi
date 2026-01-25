@@ -6,7 +6,7 @@ from variational.log_concave_sampler import spline_log_concave_sampler
 from variational.spline_estimation import get_BSpline_decomposition
 from variational.optimization import find_mode
 
-epsilon = 0.5
+eps = 0.2
 
 
 def nonparam_lsvi(f, initial_mode, initial_sampler, order=4, N=20, rho=0.5, lam=1e-2, Constraint="Concavity",
@@ -20,8 +20,10 @@ def nonparam_lsvi(f, initial_mode, initial_sampler, order=4, N=20, rho=0.5, lam=
 
     j = 0
 
+    B = lambda x: f(x)
+
     while True and j < max_iter:
-        Beta, BSpline_Basis = get_BSpline_decomposition(f=f, X=my_samples, order=order, Constraint=Constraint, lam=lam)
+        Beta, BSpline_Basis = get_BSpline_decomposition(f= lambda x: (1-eps)*f(x)+ eps*B(x), X=my_samples, order=order, Constraint=Constraint, lam=lam)
         approx_curve = Curve(BSpline_Basis, Beta)
         knots = BSpline_Basis.knots
 
@@ -40,11 +42,18 @@ def nonparam_lsvi(f, initial_mode, initial_sampler, order=4, N=20, rho=0.5, lam=
             return (deriv_matrix @ Beta.reshape(-1, 1))[0]
 
         def B(x):
-            if x > knots[order + N]:
-                return B_Prime(knots[order + N]) * (x - knots[-1]) + approx_curve.evaluate(knots[order + N])[0]
-            elif x < knots[order]:
-                return B_Prime(knots[order]) * (x - knots[0]) + approx_curve.evaluate(knots[order])[0]
-            return approx_curve.evaluate(x)[0]
+            x = np.atleast_1d(x)
+            result = np.zeros_like(x, dtype=float)
+            for i, xi in enumerate(x):
+                if xi > knots[order + N]:
+                    result[i] = B_Prime(knots[order + N]) * (xi - knots[-1]) + approx_curve.evaluate(knots[order + N])[0]
+                elif xi < knots[order]:
+                    result[i] = B_Prime(knots[order]) * (xi - knots[0]) + approx_curve.evaluate(knots[order])[0]
+                else:
+                    result[i] = approx_curve.evaluate(xi)[0]
+            if result.shape == ():
+                return result.item()
+            return result
 
         x_axis = np.linspace(a, b, 100)
         y_f = np.array([f(x) for x in x_axis])
@@ -59,8 +68,6 @@ def nonparam_lsvi(f, initial_mode, initial_sampler, order=4, N=20, rho=0.5, lam=
         plt.savefig(f'experiments/graphs/lsvi_steps/{j}.png')
         plt.close()
 
-        # if np.abs(Beta[0]) < eps and np.abs(Beta[-1]) < eps:
-        #    return approxList
         my_new_mode = find_mode(B, warm_start=my_mode, bounds={(1.5 * a, 1.5 * b)})
         _, my_sampler = spline_log_concave_sampler(B, B_Prime, mode=my_mode,
                                                    interval_for_finding_sz=(2 * a - my_new_mode, 2 * b - my_new_mode),
