@@ -86,4 +86,5 @@ def nonparam_lsvi(f, initial_mode, initial_sampler, order=4, N=20, rho=0.5, Cons
         b = np.max([b, my_samples[-1] + Delta])
         my_mode = my_new_mode
         j += 1
-    return my_samples
+
+    return samples_across_iteration

@@ -19,7 +19,7 @@ def regularization_cst_cv(f, X, num=5, log_bounds=(-3,0), order=4, Constraint="C
             f_val = f(X_val)
 
             Beta, BSpline_Basis = get_BSpline_decomposition(
-                f=lambda x: f(x),
+                density=lambda x: f(x),
                 X=X_train,
                 order=order,
                 Constraint=Constraint,
