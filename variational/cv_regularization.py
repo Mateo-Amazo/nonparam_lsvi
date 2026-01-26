@@ -36,3 +36,9 @@ def regularization_cst_cv(f, X, num=5, log_bounds=(-3,0), order=4, Constraint="C
 
         MSE_list.append(np.mean(cv_errors))
     return lambdas, MSE_list
+
+def get_lambda_cv(f, X, num=5, log_bounds=(-3,0), order=4, Constraint="Concavity", knots=None, a=None, b=None):
+
+    lambdas, MSE_list = regularization_cst_cv(f, X, num, log_bounds, order, Constraint, knots, a, b)
+    optimal_lambda = lambdas[np.argmin(MSE_list)]
+    return optimal_lambda

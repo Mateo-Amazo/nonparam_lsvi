@@ -12,7 +12,7 @@ def aux_concavity_matrix(i,j):
     if j>=3 and i>=j:
         return j-i-1
 
-def get_BSpline_decomposition(f, X, order=4, Constraint="Concavity", knots=None, a=None, b=None, lam = 1e-2):
+def get_BSpline_decomposition(density, X, order=4, Constraint="Concavity", knots=None, a=None, b=None, lam = 1e-2):
 
     sorted_X = np.sort(X)
 
@@ -28,7 +28,7 @@ def get_BSpline_decomposition(f, X, order=4, Constraint="Concavity", knots=None,
 
     BSpline_Basis = splipy.BSplineBasis(order=order, knots=knots)
 
-    f_X = f(X)
+    f_X = density(X)
     X_Tilde = BSpline_Basis.evaluate(X)
 
     D = np.eye(K, k=1) - np.eye(K)

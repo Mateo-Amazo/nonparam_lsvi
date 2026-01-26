@@ -5,11 +5,12 @@ from splipy import Curve
 from variational.log_concave_sampler import spline_log_concave_sampler
 from variational.spline_estimation import get_BSpline_decomposition
 from variational.optimization import find_mode
+from variational.cv_regularization import get_lambda_cv
 
 eps = 0.2
 
 
-def nonparam_lsvi(f, initial_mode, initial_sampler, order=4, N=20, rho=0.5, lam=1e-2, Constraint="Concavity",
+def nonparam_lsvi(f, initial_mode, initial_sampler, order=4, N=20, rho=0.5, Constraint="Concavity",
                   max_iter=10):
     samples_across_iteration = np.zeros((N, max_iter))
     my_mode = initial_mode
@@ -23,7 +24,11 @@ def nonparam_lsvi(f, initial_mode, initial_sampler, order=4, N=20, rho=0.5, lam=
     B = lambda x: f(x)
 
     while True and j < max_iter:
-        Beta, BSpline_Basis = get_BSpline_decomposition(f= lambda x: (1-eps)*f(x)+ eps*B(x), X=my_samples, order=order, Constraint=Constraint, lam=lam)
+
+        g = lambda x: (1 - eps) * f(x) + eps * B(x)
+        lam = get_lambda_cv(g, my_samples, num=5, log_bounds=(-5, 5), order=order, Constraint=Constraint, a=a, b=b)
+
+        Beta, BSpline_Basis = get_BSpline_decomposition(density= g, X=my_samples, order=order, Constraint=Constraint, lam=lam)
         approx_curve = Curve(BSpline_Basis, Beta)
         knots = BSpline_Basis.knots
 
