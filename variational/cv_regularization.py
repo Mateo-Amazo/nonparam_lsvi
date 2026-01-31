@@ -4,8 +4,9 @@ from splipy import Curve
 
 from variational.spline_estimation import get_BSpline_decomposition
 
-def regularization_cst_cv(f, X, num=5, log_bounds=(-3,0), order=4, Constraint="Concavity", knots=None, a=None, b=None):
+def regularization_cst_cv(f, X, BSpline_list=None, d=None, log_bounds=(-3,0), order=4, Constraint="Concavity", knots=None, a=None, b=None):
 
+    num = log_bounds[1] - log_bounds[0] + 1
     lambdas = np.logspace(log_bounds[0], log_bounds[1], num, base=10)
     kf = KFold(n_splits=5, shuffle=True, random_state=42)
 
@@ -21,6 +22,8 @@ def regularization_cst_cv(f, X, num=5, log_bounds=(-3,0), order=4, Constraint="C
             Beta, BSpline_Basis = get_BSpline_decomposition(
                 density=lambda x: f(x),
                 X=X_train,
+                BSpline_list=BSpline_list,
+                d=d,
                 order=order,
                 Constraint=Constraint,
                 lam=lam,
