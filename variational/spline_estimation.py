@@ -12,7 +12,7 @@ def aux_concavity_matrix(i,j):
     if j>=3 and i>=j:
         return j-i-1
 
-def get_BSpline_decomposition(density, multivariate_samples, BSpline_list=None, d=None, order=4, Constraint="Concavity", knots=None, a=None, b=None, lam=1e-2):
+def get_BSpline_decomposition(function, multivariate_samples, BSpline_list=None, d=None, order=4, Constraint="Concavity", knots=None, a=None, b=None, lam=1e-2):
 
     samples = multivariate_samples[:,d]
     sorted_samples = np.sort(samples)
@@ -34,7 +34,7 @@ def get_BSpline_decomposition(density, multivariate_samples, BSpline_list=None, 
         spline = BSpline(knots, c, order-1, extrapolate=False)
         X_Tilde[:, k] = spline(samples)
 
-    Y = np.array([density(multivariate_samples[i])-sum(B(multivariate_samples[i,k]) for k,B in enumerate(BSpline_list) if k !=d ) for i in range(N)])
+    Y = np.array([function(multivariate_samples[i])-sum(B(multivariate_samples[i,k]) for k,B in enumerate(BSpline_list) if k !=d ) for i in range(N)])
 
     D = np.eye(K, k=1) - np.eye(K)
     D = D[:-1]

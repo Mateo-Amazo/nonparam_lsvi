@@ -26,6 +26,7 @@ def nonparam_lsvi(log_density, D, order=4, N=20, rho=0.5, step_size=0.1, Constra
     j = 0
 
     BSpline_list = [lambda x: 0.0 for _ in range(D)]
+    mode_list = np.array([0.0 for _ in range(D)])
 
     while j < max_iter:
 
@@ -33,7 +34,7 @@ def nonparam_lsvi(log_density, D, order=4, N=20, rho=0.5, step_size=0.1, Constra
 
         BSpline_list = backfitting(g, multivariate_samples, order=order, Constraint=Constraint, a=a, b=b)
         x_axis = np.linspace(a, b, 100)
-        y_f = np.array([f(x) for x in x_axis])
+        y_f = np.array([log_density(x) for x in x_axis])
         y_B = np.array([B(x) for x in x_axis])
 
         # for k in knots:
@@ -48,18 +49,19 @@ def nonparam_lsvi(log_density, D, order=4, N=20, rho=0.5, step_size=0.1, Constra
         for d in range(D):
             B = BSpline_list[d]
             B_Prime = B.derivative()
-            my_new_mode = find_mode(B, warm_start=my_mode, bounds={(1.5 * a, 1.5 * b)})
-            _, my_sampler = spline_log_concave_sampler(B, B_Prime, mode=my_mode,
-                                                    interval_for_finding_sz=(2 * a - my_new_mode, 2 * b - my_new_mode),
+            mode_list[d] = find_mode(B, warm_start=mode_list[d], bounds={(1.5 * a[d], 1.5 * b[d])})
+            _, my_sampler = spline_log_concave_sampler(B, B_Prime, mode=mode_list[d],
+                                                    interval_for_finding_sz=(2 * a[d] - mode_list[d], 2 * b[d] - mode_list[d]),
                                                     rho=rho)
             my_samples = my_sampler(N)
             multivariate_samples[:, d] = my_samples
 
+            mean_diff = np.mean(np.diff(my_samples))
+            a[d] = np.min([a[d], my_samples[0] - mean_diff])
+            b[d] = np.max([b[d], my_samples[-1] + mean_diff])
+
         samples_across_iteration = np.append(samples_across_iteration, multivariate_samples)
 
-        Delta = np.array([np.mean(np.diff(multivariate_samples[:, d])) for d in range(D)])
-        a = np.min([a, my_samples[0] - Delta])
-        b = np.max([b, my_samples[-1] + Delta])
         j += 1
 
     return samples_across_iteration

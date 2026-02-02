@@ -10,4 +10,4 @@ lam = 1e-0
 
 my_log_density = log_mixture_of_gaussian
 
-samples = nonparam_lsvi(my_log_density, mode, my_initial_sampler, order=order, N=N, rho=rho)
+samples = nonparam_lsvi(my_log_density, order=order, N=N, rho=rho)
