@@ -39,7 +39,7 @@ def backfitting(g, multivariate_samples, dimension=None, order=4, Constraint="Co
             )
 
             BSpline_list_last[d] = BSpline_list[d]
-            BSpline_list[d] = lambda x: spline(x)
+            BSpline_list[d] = spline
 
         max_diff = max(
             abs(BSpline_list[d](x[d]) - BSpline_list_last[d](x[d])) 

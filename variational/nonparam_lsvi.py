@@ -31,6 +31,7 @@ def nonparam_lsvi(log_density, dimension, order=4, N=20, rho=0.5, step_size=0.1,
         BSpline_list = backfitting(g, multivariate_samples, dimension=dimension, order=order, Constraint=Constraint, a=a, b=b)
 
         for d in range(dimension):
+
             B = BSpline_list[d]
             B_Prime = B.derivative()
             mode_list[d] = find_mode(B, warm_start=mode_list[d], bounds={(1.5 * a[d], 1.5 * b[d])})
@@ -46,11 +47,11 @@ def nonparam_lsvi(log_density, dimension, order=4, N=20, rho=0.5, step_size=0.1,
 
         samples_across_iteration = np.append(samples_across_iteration, multivariate_samples)
 
-        x_axis = np.linspace(a, b, 100)
+        x_axis = np.linspace(a[0], b[0], 100)
         y_f = np.array([log_density(x) for x in x_axis])
-        y_B = np.array([B(x) for x in x_axis])
+        y_B = np.array([BSpline_list[0](x) for x in x_axis])
         plt.plot(x_axis, np.exp(y_f), label="f(x)")
-        plt.plot(x_axis, np.exp(y_B), label="B(x)")
+        plt.plot(x_axis, np.exp(y_B), label="B_0(x)")
         plt.legend()
         plt.savefig(f'experiments/graphs/lsvi_steps/{j}.png')
         plt.close()
