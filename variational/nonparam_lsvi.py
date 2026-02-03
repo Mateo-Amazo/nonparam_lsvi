@@ -7,15 +7,11 @@ from variational.optimization import find_mode
 from variational.backfitting import backfitting
 from variational.laplace import laplace_approximation
 
-def nonparam_lsvi(log_density, D, order=4, N=20, rho=0.5, step_size=0.1, Constraint="Concavity",
+def nonparam_lsvi(log_density, dimension, order=4, N=20, rho=0.5, step_size=0.1, Constraint="Concavity",
                   max_iter=10):
 
-    _, mode, hess_inv_at_mode = laplace_approximation(log_density=log_density, init=[0. for _ in range(D)])
-    sampler = lambda n: mode + np.linalg.cholesky(hess_inv_at_mode) @ np.random.multivariate_normal(mean=mode,
-                                                                                                           cov=np.eye(
-                                                                                                               mode.shape[
-                                                                                                                   0]),
-                                                                                                           size=n).T
+    _, mode, hess_inv_at_mode = laplace_approximation(log_density=log_density, init=[0. for _ in range(dimension)])
+    sampler = lambda n: np.random.multivariate_normal(mean=mode.flatten(), cov=hess_inv_at_mode, size=n)
 
     samples_across_iteration = np.array([])
     multivariate_samples = sampler(N)
@@ -25,28 +21,16 @@ def nonparam_lsvi(log_density, D, order=4, N=20, rho=0.5, step_size=0.1, Constra
 
     j = 0
 
-    BSpline_list = [lambda x: 0.0 for _ in range(D)]
-    mode_list = np.array([0.0 for _ in range(D)])
+    BSpline_list = [lambda x: 0.0 for _ in range(dimension)]
+    mode_list = np.array([0.0 for _ in range(dimension)])
 
     while j < max_iter:
 
-        g = lambda x: (1 - step_size) * log_density(x) + step_size * (sum(BSpline_list[d](x[d]) for d in range(D)))
+        g = lambda x: (1 - step_size) * log_density(x) + step_size * (sum(BSpline_list[d](x[d]) for d in range(dimension)))
 
-        BSpline_list = backfitting(g, multivariate_samples, order=order, Constraint=Constraint, a=a, b=b)
-        x_axis = np.linspace(a, b, 100)
-        y_f = np.array([log_density(x) for x in x_axis])
-        y_B = np.array([B(x) for x in x_axis])
+        BSpline_list = backfitting(g, multivariate_samples, dimension=dimension, order=order, Constraint=Constraint, a=a, b=b)
 
-        # for k in knots:
-        #    plt.axvline(k, color='gray', linestyle='--', alpha=0.8)
-
-        plt.plot(x_axis, np.exp(y_f), label="f(x)")
-        plt.plot(x_axis, np.exp(y_B), label="B(x)")
-        plt.legend()
-        plt.savefig(f'experiments/graphs/lsvi_steps/{j}.png')
-        plt.close()
-
-        for d in range(D):
+        for d in range(dimension):
             B = BSpline_list[d]
             B_Prime = B.derivative()
             mode_list[d] = find_mode(B, warm_start=mode_list[d], bounds={(1.5 * a[d], 1.5 * b[d])})
@@ -61,6 +45,15 @@ def nonparam_lsvi(log_density, D, order=4, N=20, rho=0.5, step_size=0.1, Constra
             b[d] = np.max([b[d], my_samples[-1] + mean_diff])
 
         samples_across_iteration = np.append(samples_across_iteration, multivariate_samples)
+
+        x_axis = np.linspace(a, b, 100)
+        y_f = np.array([log_density(x) for x in x_axis])
+        y_B = np.array([B(x) for x in x_axis])
+        plt.plot(x_axis, np.exp(y_f), label="f(x)")
+        plt.plot(x_axis, np.exp(y_B), label="B(x)")
+        plt.legend()
+        plt.savefig(f'experiments/graphs/lsvi_steps/{j}.png')
+        plt.close()
 
         j += 1
 

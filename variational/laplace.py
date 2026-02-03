@@ -16,4 +16,5 @@ def laplace_approximation(log_density: Callable, init: np.ndarray, optimization_
         return -log_density(theta)
 
     x, hess_inv = optimization_method(loss, init)
-    return -log_density(x), x, hess_inv
+
+    return -log_density(x), x.reshape(-1,1), hess_inv

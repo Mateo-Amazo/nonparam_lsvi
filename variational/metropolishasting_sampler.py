@@ -1,6 +1,6 @@
 import numpy as np
 
-def make_mh_sampler(log_density, proposal_std=1.0, x0=0.0, burn_in=0):
+def mh_sampler(log_density, proposal_std=1.0, x0=0.0, burn_in=0):
     def sampler(n_samples):
         samples = np.zeros(n_samples + burn_in)
         x_current = x0
