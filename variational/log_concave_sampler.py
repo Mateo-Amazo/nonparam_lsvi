@@ -10,7 +10,7 @@ def log_concave_sampler(psi_dpsi, rho, interval_for_finding_sz):
     """
     psi, dpsi = psi_dpsi
 
-    def Chi(x, rho, s_tilde, z_tilde, eta, dzeta, theta, xi):
+    def Chi(x, s_tilde, z_tilde, eta, dzeta, theta, xi):
         if -s_tilde <= x <= z_tilde:
             return 1
         if x > z_tilde:
@@ -44,9 +44,10 @@ def log_concave_sampler(psi_dpsi, rho, interval_for_finding_sz):
                 else:
                     x = -s_tilde + p * np.log(V)
 
-                if W * Chi(x, rho, s_tilde, z_tilde, eta, dzeta, theta, xi) <= np.exp(psi(x)):
+                if W * Chi(x, s_tilde, z_tilde, eta, dzeta, theta, xi) <= np.exp(psi(x)):
                     boolean = False
             my_samples[_] = x
+
         return my_samples
 
     return _sampler
