@@ -1,6 +1,8 @@
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.interpolate import BSpline
 from scipy.optimize import lsq_linear
+
 
 def aux_concavity_matrix(i,j):
     if i<j:
@@ -30,7 +32,6 @@ def get_bf_BSpline_decomposition(target_function, multivariate_samples, BSpline_
         X_Tilde[:, k] = spline(samples)
 
     Y = np.array([float(target_function(multivariate_samples[i])-sum(B(multivariate_samples[i,k]) for k,B in enumerate(BSpline_list) if k !=d )) for i in range(N)])
-    
 
     D = np.eye(K, k=1) - np.eye(K)
     D = D[:-1]
@@ -84,7 +85,7 @@ def get_BSpline_decomposition(target_function, samples, order=4, Constraint="Con
 
     X_Tilde = BSpline.design_matrix(samples, knots, order-1).toarray()
 
-    Y = np.array([target_function(samples[i]) for i in range(N)])
+    Y = np.array([float(target_function(samples[i])) for i in range(N)])
 
     D = np.eye(K, k=1) - np.eye(K)
     D = D[:-1]

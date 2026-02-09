@@ -37,16 +37,15 @@ def nonparam_lsvi(log_density, dimension, order=4, N=20, rho=0.5, step_size=0.1,
             knots = B.t
             a, b = knots[0], knots[-1]
             mode_list[d] = find_mode(B, warm_start=mode_list[d], bounds={(1.5 * a, 1.5 * b)})
-            _, my_sampler = spline_log_concave_sampler(B, B.derivative(), mode=mode_list[d],
-                                                    interval_for_finding_sz=(2 * a - mode_list[d], 2 * b - mode_list[d]),
-                                                    rho=rho)
+            #_, my_sampler = spline_log_concave_sampler(B, B.derivative(), mode=mode_list[d], interval_for_finding_sz=(2 * a - mode_list[d], 2 * b - mode_list[d]), rho=rho)
+            my_sampler = mh_sampler(log_density=lambda x: B(x), x0=mode_list[d], burn_in=20)
             my_samples = my_sampler(N)
             multivariate_samples[:, d] = my_samples
 
         samples_across_iteration = np.append(samples_across_iteration, multivariate_samples)
 
         B_0 = BSpline_list[0]
-        a, b = B_0.t[0], B_0.t[-1]
+        a, b = -5, 5#B_0.t[0], B_0.t[-1]
 
         x_axis = np.linspace(a, b, 100)
         #y_f = np.array([log_density(x) for x in x_axis])

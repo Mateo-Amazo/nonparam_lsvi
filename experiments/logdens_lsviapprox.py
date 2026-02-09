@@ -1,9 +1,8 @@
-import numpy as np
 from variational.nonparam_lsvi import nonparam_lsvi
 from experiments.problems import log_gaussian, log_shifted_scaled_gaussian, log_mixture_of_gaussian
-from variational.laplace import laplace_approximation
 
-N = 50
+
+N = 500
 order = 4
 rho = 0.5
 lam = 1e-0
