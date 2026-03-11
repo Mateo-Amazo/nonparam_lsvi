@@ -10,7 +10,8 @@ def BSpline_backfitting(target_function, covariables):
 
     d = covariables.shape[1]
 
+    responses = target_function(covariables)
+
     while True:
         for j in range(d):
             pass
-
